@@ -1,23 +1,27 @@
-# Imagen base para compilar
+# Imagen base para construir la aplicación
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar archivo .csproj desde la carpeta correcta
-COPY WebApplication1/WebApplication1/*.csproj ./
+# Copiar csproj y restaurar dependencias
+COPY WebApplication1/WebApplication1.csproj WebApplication1/
+RUN dotnet restore WebApplication1/WebApplication1.csproj
 
-# Restaurar dependencias
-RUN dotnet restore
+# Copiar el resto del código
+COPY WebApplication1/ WebApplication1/
 
-# Copiar todo el código
-COPY WebApplication1/WebApplication1/ ./
+# Publicar la app
+RUN dotnet publish WebApplication1/WebApplication1.csproj -c Release -o /app/publish
 
-# Publicar app
-RUN dotnet publish -c Release -o /app/out
-
-# Imagen final
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# Imagen final para ejecución
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build /app/out .
+COPY --from=build /app/publish .
 
-EXPOSE 80
+# Exponer puerto
+EXPOSE 8080
+
+# Render usa este env var para el puerto
+ENV PORT=8080
+
+# Ejecutar la app
 ENTRYPOINT ["dotnet", "WebApplication1.dll"]
