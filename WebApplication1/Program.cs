@@ -32,7 +32,7 @@ app.MapGet("/", () => Results.Content(@"
 <body>
     <div>
         <h1>¡Hola Mundo!</h1>
-        <p>Desde C# y ASP.NET Core 🚀</p>
+        <p>Desde C# y ASP.NET Core 🚀 — versión 2</p>
     </div>
 </body>
 </html>
